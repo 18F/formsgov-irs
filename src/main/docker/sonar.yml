@@ -1,0 +1,7 @@
+version: '2.1'
+services:
+    faasappsvc-sonar:
+        image: sonarqube:7.1-alpine
+        ports:
+            - 9001:9000
+            - 9092:9092
