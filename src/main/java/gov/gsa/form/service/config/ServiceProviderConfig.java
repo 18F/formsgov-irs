@@ -72,7 +72,7 @@ public class ServiceProviderConfig extends WebSecurityConfigurerAdapter {
         webSSOProfileOptions.setAuthnContexts(authnContext);
         // @formatter:off
         http.authorizeRequests()
-            .antMatchers("/faas/saml*").permitAll()
+            .antMatchers("/sba-4506t/saml*").permitAll()
             .and()
             .httpBasic()
             .disable()
@@ -90,7 +90,7 @@ public class ServiceProviderConfig extends WebSecurityConfigurerAdapter {
             .and()
             .sso()
             .profileOptions(webSSOProfileOptions)
-            .defaultSuccessURL("/faas/ui")
+            .defaultSuccessURL("/sba-4506t/ui")
 //            .idpSelectionPageURL("/idpselection")
             .and()
             .authenticationProvider()

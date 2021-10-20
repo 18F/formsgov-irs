@@ -27,11 +27,11 @@ export const App = () => {
           toastClassName="toastify-toast"
         />
         <Header />
-        <main className="main-content  background" id="main-content" aria-label="Content">
+        <main className="main-content background pb-5" id="main-content" aria-label="Content">
           <div>
             <div className="grid-container">
               <div className="grid-row">
-                <div className="grid-col-12 card">
+                <div className="grid-col-12">
                   <ErrorBoundary>
                     <AppRoutes />
                   </ErrorBoundary>

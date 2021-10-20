@@ -12,7 +12,7 @@ const iconDot = require('../../../../content/images/icon-dot-gov.svg');
 // tslint:disable-next-line
 const iconHttps = require('../../../../content/images/icon-https.svg');
 // tslint:disable-next-line
-const irsLogo = require('../../../../content/images/irs-logo.png');
+const sbaLogo = require('../../../../content/images/sba-logo.svg');
 
 const Header = () => {
   return (
@@ -74,49 +74,11 @@ const Header = () => {
           <div className="usa-navbar desktop:maxw-card height-auto flex-align-right">
             <div className="logo">
               <Link to="/">
-                <img src={irsLogo} alt="IRS logo" />
+                <img src={sbaLogo} alt="SBA logo" />
               </Link>
               <span className="usa-sr-only">Home</span>
             </div>
-
           </div>
-          {/*<nav aria-label="Primary navigation" className="usa-nav" role="navigation">*/}
-          {/*  <button className="usa-nav__close">*/}
-          {/*    <img src={close} alt="close" />*/}
-          {/*  </button>*/}
-          {/*  <ul className="usa-nav__primary usa-accordion">*/}
-          {/*    <li className="usa-nav__primary-item">*/}
-          {/*      <NavLink exact activeClassName="usa-current" to="/">*/}
-          {/*        <span>Home</span>*/}
-          {/*      </NavLink>*/}
-          {/*    </li>*/}
-          {/*    <li className="usa-nav__primary-item">*/}
-          {/*      <button className="usa-accordion__button usa-nav__link" aria-expanded="false" aria-controls="nav-2">*/}
-          {/*        <span>Forms</span>*/}
-          {/*      </button>*/}
-          {/*      <ul id="nav-2" className="usa-nav__submenu">*/}
-          {/*        <li className="usa-nav__submenu-item">*/}
-          {/*          <Link to="/fheo">*/}
-          {/*            <span>FHEO</span>*/}
-          {/*          </Link>*/}
-          {/*        </li>*/}
-          {/*        <li className="usa-nav__submenu-item">*/}
-          {/*          <Link to="/">*/}
-          {/*            <span>MTW</span>*/}
-          {/*          </Link>*/}
-          {/*        </li>*/}
-          {/*      </ul>*/}
-          {/*    </li>*/}
-          {/*    <li className="usa-nav__primary-item">*/}
-          {/*      <a href="/" ><span>Dashboard</span></a>*/}
-          {/*    </li>*/}
-          {/*    <li className="usa-nav__primary-item">*/}
-          {/*      <NavLink className="usa-nav__link" exact activeClassName="usa-current" to="/admin">*/}
-          {/*        <span>Admin</span>*/}
-          {/*      </NavLink>*/}
-          {/*    </li>*/}
-          {/*  </ul>*/}
-          {/*</nav>*/}
         </div>
       </header>
     </div>

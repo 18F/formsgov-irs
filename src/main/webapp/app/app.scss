@@ -2,11 +2,11 @@
 @import 'bootstrap-variables';
 // Import Bootstrap source files from node_modules
 @import 'node_modules/bootstrap/scss/bootstrap';
+@import '~@cmsgov/design-system/dist/css/index.css';
 body {
   background-color: #f1f1f1;
   color: color('ink');
   overflow-x: hidden;
-
   display: block;
 }
 
@@ -18,7 +18,6 @@ html {
 }
 
 a {
-  color: #533f03;
   font-weight: bold;
 }
 
@@ -352,12 +351,6 @@ http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
   background-color: #aeb0b5 !important;
 }
 
-.card {
-  background-color: #f2f5f7;
-  background-clip: border-box;
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
-  padding: 20px;
-  margin-bottom: 30px;
-  margin-top: 10px;
+.pad-box {
+  padding-top: 2rem;
 }

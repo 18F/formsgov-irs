@@ -21,9 +21,4 @@ public class FormResource {
         log.info("Pdf Url :{} and Pdf Name :{}", pdfUrl, pdfName);
         return signRequest.executeSignRequest(pdfUrl, pdfName);
     }
-
-    @PostMapping(value = "/fheo", consumes = "application/json")
-    public void fheo(@RequestBody String payload)  {
-        log.info("***** FHEO payload **** :{}",payload);
-    }
 }
