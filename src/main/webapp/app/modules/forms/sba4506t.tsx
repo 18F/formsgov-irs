@@ -21,7 +21,7 @@ export const SBAFORM = () => {
   const requestData = {
     data: {
       email: 'service@gsa.gov',
-      password: 'vBEJbMK6DAydFjBitmLbB4ndBhHZpm'
+      password: ''
     }
   };
   const login = async () => {

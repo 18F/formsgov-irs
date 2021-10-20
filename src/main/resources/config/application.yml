@@ -102,5 +102,5 @@ host: ${HOST:form.app.cloud.gov}
 port: ${PORT:8181}
 
 #sign request
-sign-request-token: ${SIGN_REQUEST_TOKEN:003fe3c90ac3b980c6ccf9316dbcfca931ef3045}
+sign-request-token: ${SIGN_REQUEST_TOKEN:}
 sign-request-url: ${SIGN_REQUEST_URL:https://sba.sign-dev.forms.gov/api/v1/signrequest-quick-create/}
