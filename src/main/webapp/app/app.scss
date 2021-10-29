@@ -3,12 +3,20 @@
 // Import Bootstrap source files from node_modules
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import '~bootswatch/dist/cosmo/bootswatch';
+@import '@trussworks/react-uswds/lib/uswds.css';
+@import '@trussworks/react-uswds/lib/index.css';
 body {
+  color: color('ink');
   margin: 0;
 }
 
+html {
+  font-feature-settings: 'kern' 1;
+  font-kerning: normal;
+  font-family: Source Sans Pro Web, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
+  font-size: 100%;
+}
 a {
-  color: #533f03;
   font-weight: bold;
 }
 
@@ -23,6 +31,8 @@ a {
 }
 
 .app-container {
+  position: relative;
+  min-height: 100vh;
   box-sizing: border-box;
   .view-container {
     width: 100%;
@@ -30,9 +40,6 @@ a {
     overflow-y: auto;
     overflow-x: hidden;
     padding: 1rem;
-    .card {
-      padding: 1rem;
-    }
     .view-routes {
       height: 100%;
       > div {
@@ -41,7 +48,6 @@ a {
     }
   }
 }
-
 .fullscreen {
   position: fixed;
   top: 100px;
@@ -310,4 +316,14 @@ http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
   width: 1% !important;
 }
 
-/* jhipster-needle-scss-add-main JHipster will add new css style */
+hr.bar {
+  border: 0.5px solid #0071bc;
+}
+@media (max-width: 63.99em) {
+  .usa-logo {
+    flex: 1 1 0%;
+    font-size: 0.93rem;
+    line-height: 0.9;
+    margin-left: 0rem !important;
+  }
+}

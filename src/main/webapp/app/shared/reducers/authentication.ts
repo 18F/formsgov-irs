@@ -1,8 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { serializeAxiosError } from './reducer.utils';
-
-import { AppThunk } from 'app/config/store';
+import { AppThunk } from '../../../app/config/store';
 
 export const initialState = {
   loading: false,

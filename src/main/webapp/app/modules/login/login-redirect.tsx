@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { REDIRECT_URL } from 'app/shared/util/url-utils';
+import { REDIRECT_URL } from '../../../app/shared/util/url-utils';
 
 export const LoginRedirect = props => {
   useEffect(() => {

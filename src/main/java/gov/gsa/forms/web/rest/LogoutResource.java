@@ -25,7 +25,6 @@ public class LogoutResource {
 
     /**
      * {@code POST  /api/logout} : logout the current user.
-     *
      * @param request the {@link HttpServletRequest}.
      * @param idToken the ID token.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and a body with a global logout URL.
@@ -49,8 +48,12 @@ public class LogoutResource {
             // Auth0
             logoutUrl.append("?client_id=").append(this.registration.getClientId()).append("&returnTo=").append(originUrl);
         } else {
-            // Okta
-            logoutUrl.append("?id_token_hint=").append(idToken.getTokenValue()).append("&post_logout_redirect_uri=").append(originUrl);
+            // login.gov
+            logoutUrl
+                .append("?id_token_hint=")
+                .append(idToken.getTokenValue())
+                .append("&post_logout_redirect_uri=")
+                .append("{baseUrl}/login/oauth2/code/oidc");
         }
 
         request.getSession().invalidate();

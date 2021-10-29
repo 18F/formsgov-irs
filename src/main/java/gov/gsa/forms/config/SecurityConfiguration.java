@@ -5,6 +5,7 @@ import gov.gsa.forms.security.SecurityUtils;
 import gov.gsa.forms.security.oauth2.AudienceValidator;
 import gov.gsa.forms.security.oauth2.CustomClaimConverter;
 import gov.gsa.forms.security.oauth2.JwtGrantedAuthorityConverter;
+import java.net.URI;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,14 +19,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
@@ -47,10 +51,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final SecurityProblemSupport problemSupport;
 
-    public SecurityConfiguration(CorsFilter corsFilter, JHipsterProperties jHipsterProperties, SecurityProblemSupport problemSupport) {
+    private final ClientRegistrationRepository clientRegistrationRepository;
+
+    public SecurityConfiguration(
+        CorsFilter corsFilter,
+        JHipsterProperties jHipsterProperties,
+        SecurityProblemSupport problemSupport,
+        ClientRegistrationRepository clientRegistrationRepository
+    ) {
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
         this.jHipsterProperties = jHipsterProperties;
+        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Override
@@ -68,44 +80,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
-        http
-            .csrf()
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-        .and()
-            .addFilterBefore(corsFilter, CsrfFilter.class)
-            .exceptionHandling()
-                .authenticationEntryPoint(problemSupport)
-                .accessDeniedHandler(problemSupport)
-        .and()
-            .headers()
-            .contentSecurityPolicy(jHipsterProperties.getSecurity().getContentSecurityPolicy())
-        .and()
-            .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-        .and()
-            .permissionsPolicy().policy("camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")
-        .and()
-            .frameOptions()
-            .deny()
-        .and()
-            .authorizeRequests()
-            .antMatchers("/api/authenticate").permitAll()
-            .antMatchers("/api/auth-info").permitAll()
-            .antMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-            .antMatchers("/api/**").authenticated()
-            .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/health/**").permitAll()
-            .antMatchers("/management/info").permitAll()
-            .antMatchers("/management/prometheus").permitAll()
-            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-        .and()
-            .oauth2Login()
-        .and()
-            .oauth2ResourceServer()
-                .jwt()
-                .jwtAuthenticationConverter(authenticationConverter())
-                .and()
+        http.csrf().disable().authorizeRequests()
+            .antMatchers("/", "api/logout", "/logout-success", "/manifest.webapp", "/login**", "/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
+            .permitAll()
+            .antMatchers("/form/**").authenticated()
+            .anyRequest()
+            .authenticated()
             .and()
-                .oauth2Client();
+            .logout()
+            .logoutSuccessUrl("/logout-success")
+            .and()
+            .oauth2Login()
+            .defaultSuccessUrl("/", true)
+            .and()
+            .oauth2ResourceServer()
+            .jwt()
+            .jwtAuthenticationConverter(authenticationConverter())
+            .and()
+            .and()
+            .oauth2Client();
         // @formatter:on
     }
 

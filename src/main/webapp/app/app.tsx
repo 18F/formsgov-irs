@@ -6,16 +6,16 @@ import React, { useEffect } from 'react';
 import { Card } from 'reactstrap';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { getSession } from 'app/shared/reducers/authentication';
-import { getProfile } from 'app/shared/reducers/application-profile';
-import Header from 'app/shared/layout/header/header';
-import Footer from 'app/shared/layout/footer/footer';
-import { hasAnyAuthority } from 'app/shared/auth/private-route';
-import ErrorBoundary from 'app/shared/error/error-boundary';
-import { AUTHORITIES } from 'app/config/constants';
-import AppRoutes from 'app/routes';
+import { useAppDispatch, useAppSelector } from '../app/config/store';
+import { getSession } from '../app/shared/reducers/authentication';
+import { getProfile } from '../app/shared/reducers/application-profile';
+import Header from '../app/shared/layout/header/header';
+import Footer from '../app/shared/layout/footer/footer';
+import { hasAnyAuthority } from '../app/shared/auth/private-route';
+import ErrorBoundary from '../app/shared/error/error-boundary';
+import { AUTHORITIES } from '../app/config/constants';
+import AppRoutes from '../app/routes';
+import HeaderBar from './shared/layout/header/header-bar';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
@@ -33,31 +33,27 @@ export const App = () => {
   const isInProduction = useAppSelector(state => state.applicationProfile.inProduction);
   const isOpenAPIEnabled = useAppSelector(state => state.applicationProfile.isOpenAPIEnabled);
 
-  const paddingTop = '60px';
   return (
     <Router basename={baseHref}>
-      <div className="app-container" style={{ paddingTop }}>
+      <div className="app-container">
         <ToastContainer position={toast.POSITION.TOP_LEFT} className="toastify-container" toastClassName="toastify-toast" />
         <ErrorBoundary>
-          <Header
-            isAuthenticated={isAuthenticated}
-            isAdmin={isAdmin}
-            ribbonEnv={ribbonEnv}
-            isInProduction={isInProduction}
-            isOpenAPIEnabled={isOpenAPIEnabled}
-          />
+          <HeaderBar isAuthenticated={isAuthenticated} isAdmin={isAdmin} isInProduction={isInProduction} />
         </ErrorBoundary>
-        <div className="container-fluid view-container" id="app-view-container">
-          <Card className="jh-card">
-            <ErrorBoundary>
-              <AppRoutes />
-            </ErrorBoundary>
-          </Card>
-          <Footer />
-        </div>
+        <main className="main-content pb-5 pt-3 pl-3" id="main-content" aria-label="Content">
+          <div className="grid-container pb-5">
+            <div className="grid-row">
+              <div className="grid-col-12">
+                <ErrorBoundary>
+                  <AppRoutes />
+                </ErrorBoundary>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     </Router>
   );
 };
-
 export default App;
