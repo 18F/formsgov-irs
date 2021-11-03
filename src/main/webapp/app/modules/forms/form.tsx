@@ -5,13 +5,17 @@ import uswds from '@formio/uswds';
 import { Formio } from 'formiojs';
 import http from '../../shared/service/http-service';
 import { Spinner } from '../../shared/util/utils';
+import { useAppSelector } from '../../../app/config/store';
+import LoadingOverlay from 'react-loading-overlay';
+import { FadeLoader } from 'react-spinners';
 Formio.use(uswds);
 export const Forms = () => {
   const [submissionId, setSubmissionId] = useState(0);
   const [jwtToken, setJwtToken] = useState(0);
   const [user, setUser] = useState({});
   const [embedUrl, setEmbedUrl] = useState('');
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState(true);
+  const account = useAppSelector(state => state.authentication.account);
   const xAllow = `GET:/project/611bd732192fb363527df70d/form/6152179c7e96b7d08f0333bb/submission/${submissionId}/download`;
   useEffect(() => {
     login();
@@ -21,7 +25,7 @@ export const Forms = () => {
   const requestData = {
     data: {
       email: 'service@gsa.gov',
-      password: 'vBEJbMK6DAydFjBitmLbB4ndBhHZpm',
+      password: '',
     },
   };
   const login = async () => {
@@ -55,14 +59,13 @@ export const Forms = () => {
       });
   };
   const handleOnSubmitDone = e => {
-    setLoader(true);
     /* eslint no-console: off */
     console.log('handleOnSubmitDone ' + e);
     getATokenKeyAndSign();
   };
   const handleOnSubmit = event => {
-    setLoader(true);
     setSubmissionId(event._id);
+    setLoader(true);
     /* eslint no-console: off */
     console.log('handleOnSubmit ', event);
   };
@@ -81,6 +84,9 @@ export const Forms = () => {
     console.log('response ***** ' + JSON.stringify(response));
     const embed_url = response.signers[0].embed_url;
     setEmbedUrl(embed_url);
+  };
+
+  const handelOnRender = () => {
     setLoader(false);
   };
 
@@ -88,30 +94,34 @@ export const Forms = () => {
   const formattedPhone = phone !== undefined ? phone.replace(/\D+/g, '').replace(/^(\d{3})(\d{3})(\d{4}).*/, '($1) $2-$3') : '';
   const submissionData = {
     data: {
-      name1: user['firstName'] + ' ' + user['lastName'],
+      name1: account.firstName + ' ' + account.lastName,
       // taxpayerLastName: user['lastName'],
-      currentNameAndAddress: user['address1'] + ', ' + user['city'] + ', ' + user['state'] + ', ' + user['zipcode'],
+      currentNameAndAddress: account.firstName + ' ' + account.lastName + ' , ' + account.formatted,
       // taxpayerCity: user['city'],
       // taxpayerZip: user['zipcode'],
       // taxpayerState: user['state'],
       // taxpayerDaytimePhoneNumber: formattedPhone,
-      socialSecurityNumber: user['ssn'],
+      socialSecurityNumber: account.ssn,
     },
   };
   return (
-    <div className="ds-u-padding--2" style={{ position: 'relative' }}>
+    <LoadingOverlay
+      active={loader}
+      styles={{ overlay: base => ({ ...base, background: 'rgba(0, 0, 0, 0.1)' }) }}
+      spinner={<FadeLoader color={'#4A90E2'} />}
+    >
       {embedUrl === '' ? (
         <Form
           src="https://portal-test.forms.gov/agencydemo-dev/4506t"
           onSubmitDone={handleOnSubmitDone}
           onSubmit={handleOnSubmit}
           submission={submissionData}
+          onRender={handelOnRender}
         />
       ) : (
         (window.location.href = embedUrl)
       )}
-      {loader && <Spinner />}
-    </div>
+    </LoadingOverlay>
   );
 };
 export default Forms;

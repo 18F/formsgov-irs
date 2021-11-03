@@ -24,7 +24,7 @@ export const App = () => {
 
   useEffect(() => {
     dispatch(getSession());
-    dispatch(getProfile());
+    // dispatch(getProfile());
   }, []);
 
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);

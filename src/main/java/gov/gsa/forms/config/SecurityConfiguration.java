@@ -44,8 +44,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JHipsterProperties jHipsterProperties;
 
-    private final CorsFilter corsFilter;
-
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
 
@@ -59,7 +57,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         SecurityProblemSupport problemSupport,
         ClientRegistrationRepository clientRegistrationRepository
     ) {
-        this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
         this.jHipsterProperties = jHipsterProperties;
         this.clientRegistrationRepository = clientRegistrationRepository;
@@ -80,8 +77,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
-        http.csrf().disable().authorizeRequests()
-            .antMatchers("/", "api/logout", "/logout-success", "/manifest.webapp", "/login**", "/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
+        http.csrf().and().authorizeRequests()
+            .antMatchers("/", "api/account", "api/logout", "/logout-success","/*.woff2","/*.ttf", "/manifest.webapp", "/login**", "/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
             .permitAll()
             .antMatchers("/form/**").authenticated()
             .anyRequest()
@@ -109,7 +106,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Map authorities from "groups" or "roles" claim in ID Token.
+     * Map authorities from "groups" or "roles" claim in ID Token.d
      *
      * @return a {@link GrantedAuthoritiesMapper} that maps groups from
      * the IdP to Spring Security Authorities.
@@ -118,7 +115,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public GrantedAuthoritiesMapper userAuthoritiesMapper() {
         return authorities -> {
             Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
             authorities.forEach(authority -> {
                 // Check for OidcUserAuthority because Spring Security 5.2 returns
                 // each scope as a GrantedAuthority, which we don't care about.
@@ -134,16 +130,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     JwtDecoder jwtDecoder(ClientRegistrationRepository clientRegistrationRepository, RestTemplateBuilder restTemplateBuilder) {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
-
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(jHipsterProperties.getSecurity().getOauth2().getAudience());
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
         OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
-
         jwtDecoder.setJwtValidator(withAudience);
         jwtDecoder.setClaimSetConverter(
             new CustomClaimConverter(clientRegistrationRepository.findByRegistrationId("oidc"), restTemplateBuilder.build())
         );
-
         return jwtDecoder;
     }
 }

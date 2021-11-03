@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
 import getStore from './config/store';
 import setupAxiosInterceptors from './config/axios-interceptor';
 import { clearAuthentication } from './shared/reducers/authentication';

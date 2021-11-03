@@ -1,20 +1,30 @@
 package gov.gsa.forms.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.shaded.json.JSONObject;
 import gov.gsa.forms.config.Constants;
 import gov.gsa.forms.service.dto.AdminUserDTO;
+import gov.gsa.forms.service.dto.UserAddress;
 import gov.gsa.forms.service.dto.UserDTO;
+import gov.gsa.forms.util.ObjectMapperUtil;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * Service class for managing users.
  */
 @Service
+@Slf4j
 public class UserService {
 
     /**
@@ -39,6 +49,8 @@ public class UserService {
     }
 
     private static AdminUserDTO getUser(Map<String, Object> details) {
+        log.info("User details scope  :{}", details);
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         AdminUserDTO user = new AdminUserDTO();
         Boolean activated = Boolean.TRUE;
         // handle resource server JWT, where sub claim is email and uid is ID
@@ -87,7 +99,16 @@ public class UserService {
         if (details.get("picture") != null) {
             user.setImageUrl((String) details.get("picture"));
         }
+        if (details.get("social_security_number") != null) {
+            user.setSsn((String) details.get("social_security_number"));
+        }
+        if (details.get("address") != null) {
+            JSONObject addressAttr = (JSONObject) details.get("address");
+            Object formatted = addressAttr.get("formatted");
+            user.setFormatted((String) formatted);
+        }
         user.setActivated(activated);
+        request.getSession().setAttribute("user", user);
         return user;
     }
 }

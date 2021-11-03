@@ -31,7 +31,7 @@ export const Home = () => {
           </div>
         ) : (
           <>
-            <h2>Welcome, FORMS.GOV!</h2>
+            <h2>Welcome to FORMS.GOV!</h2>
             <SummaryBox heading="Login Information">
               Please sign here with
               <span>&nbsp;</span>
@@ -43,21 +43,20 @@ export const Home = () => {
         )}
         <br />
         <p>Available forms:</p>
-
         <ul>
           <li>
             <a href="javascript:void(0);" target="_blank" rel="noopener noreferrer" className="usa-link">
-              form 4506-T
+              Form 4506-T
             </a>
           </li>
           <li>
             <a href="javascript:void(0);" target="_blank" rel="noopener noreferrer" className="usa-link">
-              form 8821
+              Form 8821
             </a>
           </li>
           <li>
             <a href="javascript:void(0);" target="_blank" rel="noopener noreferrer" className="usa-link">
-              form 656
+              Form 656
             </a>
           </li>
         </ul>

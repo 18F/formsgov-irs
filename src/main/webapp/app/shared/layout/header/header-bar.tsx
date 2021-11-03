@@ -2,7 +2,7 @@ import './header.scss';
 import React, { useState } from 'react';
 import { getLoginUrl } from '../../../../app/shared/util/url-utils';
 import { GovBanner, Header, Menu, NavDropDownButton, NavList, NavMenuButton, PrimaryNav, Title } from '@trussworks/react-uswds';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export interface IHeaderProps {
   isAuthenticated: boolean;
@@ -14,11 +14,12 @@ const HeaderBar = (props: IHeaderProps) => {
   const [expanded, setExpanded] = useState(false);
   const onClick = (): void => setExpanded(prvExpanded => !prvExpanded);
   const [isOpen, setIsOpen] = useState([false, false]);
+  const location = useLocation();
   const formsMenuItems = [
-    <Link to="/form/4506-T" key="one">
+    <Link to="/form/4506-T" key="4506-T">
       form-4506T
     </Link>,
-    <Link to="/8821" key="two">
+    <Link to="/8821" key="8821">
       form-8821
     </Link>,
   ];
@@ -32,7 +33,7 @@ const HeaderBar = (props: IHeaderProps) => {
   };
 
   const formsItemsMenu = [
-    <Link to="/" key="home" className="usa-nav__link">
+    <Link to="/" key="home" className={location.pathname === '/' ? 'usa-nav__link usa-current' : 'usa-nav__link'}>
       <span>Home</span>
     </Link>,
     <>
@@ -45,7 +46,7 @@ const HeaderBar = (props: IHeaderProps) => {
             }}
             isOpen={isOpen[0]}
             label="Forms"
-            isCurrent={true}
+            isCurrent={location.pathname === '/form/4506-T'}
           />
           <Menu key="one" items={formsMenuItems} isOpen={isOpen[0]} id="formsDropDownOne" />
         </>

@@ -1,9 +1,23 @@
 import './footer.scss';
 import React from 'react';
-import { Logo } from '@trussworks/react-uswds';
 const Footer = () => (
-  <div className="usa-footer__secondary-section footer">
-    <Logo image={<img className="footer-logo-img" src="content/images/Formsgov_50px.png" alt="forms.gov" />} />
-  </div>
+  <footer>
+    <hr />
+    <div className="grid-row grid-gap">
+      <div className="tablet:grid-col-12 child">
+        <a href="http://www.irs.gov" target="_blank" rel="noopener noreferrer" className="usa-link">
+          IRS.gov
+        </a>{' '}
+        &nbsp;| &nbsp;
+        <a href="https://www.login.gov" target="_blank" rel="noopener noreferrer" className="usa-link">
+          login.gov
+        </a>{' '}
+        &nbsp;| &nbsp;
+        <a href="https://home.treasury.gov/" target="_blank" rel="noopener noreferrer" className="usa-link">
+          Treasury.gov
+        </a>
+      </div>
+    </div>
+  </footer>
 );
 export default Footer;
