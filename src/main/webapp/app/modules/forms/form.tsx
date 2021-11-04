@@ -14,7 +14,7 @@ export const Forms = () => {
   const [jwtToken, setJwtToken] = useState(0);
   const [user, setUser] = useState({});
   const [embedUrl, setEmbedUrl] = useState('');
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
   const account = useAppSelector(state => state.authentication.account);
   const xAllow = `GET:/project/611bd732192fb363527df70d/form/6152179c7e96b7d08f0333bb/submission/${submissionId}/download`;
   useEffect(() => {
@@ -25,7 +25,7 @@ export const Forms = () => {
   const requestData = {
     data: {
       email: 'service@gsa.gov',
-      password: '',
+      password: 'vBEJbMK6DAydFjBitmLbB4ndBhHZpm',
     },
   };
   const login = async () => {
@@ -86,9 +86,9 @@ export const Forms = () => {
     setEmbedUrl(embed_url);
   };
 
-  const handelOnRender = () => {
-    setLoader(false);
-  };
+  // const handelOnRender = () => {
+  //   setLoader(false);
+  // };
 
   const phone = user['phone'];
   const formattedPhone = phone !== undefined ? phone.replace(/\D+/g, '').replace(/^(\d{3})(\d{3})(\d{4}).*/, '($1) $2-$3') : '';
@@ -116,7 +116,6 @@ export const Forms = () => {
           onSubmitDone={handleOnSubmitDone}
           onSubmit={handleOnSubmit}
           submission={submissionData}
-          onRender={handelOnRender}
         />
       ) : (
         (window.location.href = embedUrl)

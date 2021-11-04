@@ -1,7 +1,7 @@
 package gov.gsa.forms.service.dto;
 
-import com.nimbusds.openid.connect.sdk.claims.Address;
 import gov.gsa.forms.config.Constants;
+import java.io.Serializable;
 import java.util.Set;
 import javax.validation.constraints.*;
 import lombok.Data;
@@ -13,8 +13,9 @@ import org.springframework.web.context.annotation.SessionScope;
  */
 @Data
 @SessionScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class AdminUserDTO {
+public class AdminUserDTO implements Serializable {
 
+    private static final long serialVersionUID = -3728762075222440465L;
     private String id;
 
     @NotBlank

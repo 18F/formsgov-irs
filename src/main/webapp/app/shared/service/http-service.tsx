@@ -15,19 +15,20 @@ if (process.env.NODE_ENV === 'development') {
 }
 axios.interceptors.response.use(null, error => {
   console.error('Interceptors Error ', error);
-  const expectedError = error.response && error.response.status && error.response.status === 500;
-  if (expectedError) {
-    console.error('Internal server error occured', error, error.response.status);
+  const expectedError = error.response && error.response.status && error.response.status === 401;
+  if (error.config.url === 'api/account' && expectedError) {
+    console.error('Unauthorized User', error, error.response.status);
+  } else {
     toast.error(errorMessage, {
-      position: 'top-center',
+      position: toast.POSITION.TOP_LEFT,
       autoClose: 12000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
     });
+    return Promise.reject(error);
   }
-  return Promise.reject(error);
 });
 export default {
   get: axios.get,

@@ -42,7 +42,21 @@ spring:
     locator:
       discovery:
         enabled: true
-
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: https://idp.int.identitysandbox.gov/
+            authorization-uri: https://idp.int.identitysandbox.gov/openid_connect/authorize?acr_values=http://idmanagement.gov/ns/assurance/ial/2
+            end-session-endpoint: https://idp.int.identitysandbox.gov/openid_connect/logout
+        registration:
+          oidc:
+            client-id: urn:gov:gsa:openidconnect.profiles:sp:sso:irs:irs-int
+            authorization-grant-type: authorization_code
+            redirect-uri: https://form-irs.app.cloud.gov/login/oauth2/code/oidc
+            scope: openid,profile,email,social_security_number,address
+            end-session-endpoint: https://idp.int.identitysandbox.gov/openid_connect/logout
 # ===================================================================
 # To enable TLS in production, generate a certificate using:
 # keytool -genkey -alias formsgov -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
@@ -97,3 +111,10 @@ jhipster:
 # ===================================================================
 
 # application:
+# application:
+security.saml2:
+  entityId: ${ENTITYID:urn:gov:gsa:openidconnect.profiles:sp:sso:irs:irs-int}
+  #    entityId: ${ENTITYID:urn:gov:gsa:SAML:2.0.profiles:sp:sso:sba:4506T}
+  metadata-url: ${METADATA_URL:https://idp.int.identitysandbox.gov/api/saml/metadata2021}
+host: ${HOST:}
+sign-request-redirect-url: ${SIGN_REQUEST_REDIRECT_URL:https://form-irs.app.cloud.gov}

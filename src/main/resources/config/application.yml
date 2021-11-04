@@ -100,21 +100,6 @@ spring:
   output:
     ansi:
       console-available: true
-  security:
-    oauth2:
-      client:
-        provider:
-          oidc:
-            issuer-uri: https://idp.int.identitysandbox.gov/
-            authorization-uri: https://idp.int.identitysandbox.gov/openid_connect/authorize?acr_values=http://idmanagement.gov/ns/assurance/ial/2
-            end-session-endpoint: https://idp.int.identitysandbox.gov/openid_connect/logout
-        registration:
-          oidc:
-            client-id: urn:gov:gsa:openidconnect.profiles:sp:sso:irs:irs-int
-            authorization-grant-type: authorization_code
-            redirect-uri: https://form-irs.app.cloud.gov/login/oauth2/code/oidc
-            scope: openid,profile,email,social_security_number,address
-            end-session-endpoint: https://idp.int.identitysandbox.gov/openid_connect/logout
 #    oauth2:
 #      client:
 #        registration:
@@ -190,22 +175,21 @@ jhipster:
 
 # application:
 security.saml2:
-  entityId: ${ENTITYID:urn:gov:gsa:SAML:2.0.profiles:sp:sso:sba:IRS-POC}
+  entityId: ${ENTITYID:urn:gov:gsa:openidconnect.profiles:sp:sso:irs:irs-poc}
   #    entityId: ${ENTITYID:urn:gov:gsa:SAML:2.0.profiles:sp:sso:sba:4506T}
   metadata-url: ${METADATA_URL:https://idp.int.identitysandbox.gov/api/saml/metadata2021}
-host: ${HOST:form-irs.app.cloud.gov}
 #host: ${HOST:localhost}
-port: ${PORT:8181}
+#port: ${PORT:8181}
 #end-point: ${ENDPOINT:}
 #sign request
-#irs-token =
+#irs-token = 92a939d0b78bcee555c5bcad13abde6df1c68973
 #irs-url = https://irs.sign-dev.forms.gov/api/v1/signrequest-quick-create/
-#sba-token =
+#sba-token = 003fe3c90ac3b980c6ccf9316dbcfca931ef3045
 #sba-url = https://irs.sign-dev.forms.gov/api/v1/signrequest-quick-create/
-sign-request-token: ${SIGN_REQUEST_TOKEN:}
+sign-request-token: ${SIGN_REQUEST_TOKEN:92a939d0b78bcee555c5bcad13abde6df1c68973}
 sign-request-base-url: ${SIGN_BASE_URL:https://irs.sign-dev.forms.gov/api/v1/}
 sign-request-create-url: ${SIGN_CREATE_URL:signrequest-quick-create/}
 sign-request-documents-url: ${SIGN_DOCUMENTS_URL:documents/}
 #IRS API
-irs-api-token: ${IRS_API_TOKEN:}
+irs-api-token: ${IRS_API_TOKEN:TLLANK29fUrzkXUjsnuDbEaB}
 irs-api-url: ${IRS_API_URL:https://iam-poc.wc2m.treasury.gov/iam/esignature/signatureForm}

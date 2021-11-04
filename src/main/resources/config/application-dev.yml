@@ -43,7 +43,21 @@ spring:
     locator:
       discovery:
         enabled: true
-
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: https://idp.int.identitysandbox.gov/
+            authorization-uri: https://idp.int.identitysandbox.gov/openid_connect/authorize?acr_values=http://idmanagement.gov/ns/assurance/ial/2
+            end-session-endpoint: https://idp.int.identitysandbox.gov/openid_connect/logout
+        registration:
+          oidc:
+            client-id: urn:gov:gsa:openidconnect.profiles:sp:sso:irs:irs-poc
+            authorization-grant-type: authorization_code
+            redirect-uri: https://localhost:8181/login/oauth2/code/oidc
+            scope: openid,profile,email,social_security_number,address
+            end-session-endpoint: https://idp.int.identitysandbox.gov/openid_connect/logout
 server:
   port: 8181
 
@@ -80,3 +94,10 @@ jhipster:
 # ===================================================================
 
 # application:
+security.saml2:
+  entityId: ${ENTITYID:urn:gov:gsa:openidconnect.profiles:sp:sso:irs:irs-poc}
+  #    entityId: ${ENTITYID:urn:gov:gsa:SAML:2.0.profiles:sp:sso:sba:4506T}
+  metadata-url: ${METADATA_URL:https://idp.int.identitysandbox.gov/api/saml/metadata2021}
+host: ${HOST:localhost}
+port: ${PORT:8181}
+sign-request-redirect-url: ${SIGN_REQUEST_REDIRECT_URL:https://localhost:8181}

@@ -13,8 +13,8 @@ const Footer = () => (
           login.gov
         </a>{' '}
         &nbsp;| &nbsp;
-        <a href="https://home.treasury.gov/" target="_blank" rel="noopener noreferrer" className="usa-link">
-          Treasury.gov
+        <a href="https://forms.gov/" target="_blank" rel="noopener noreferrer" className="usa-link">
+          Forms.gov
         </a>
       </div>
     </div>

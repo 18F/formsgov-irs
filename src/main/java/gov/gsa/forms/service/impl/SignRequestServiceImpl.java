@@ -38,14 +38,7 @@ public class SignRequestServiceImpl implements SignRequestService {
 
     private static final String REDIRECT_URL_SIGNED = "/sign-success";
     private static final String REDIRECT_URL_NOT_SIGNED = "/sign-unsuccessful";
-    private static final String HTTPS = "https://";
     private static final String USER = "user";
-
-    @Value("${host}")
-    private String host;
-
-    @Value("${port}")
-    private String port;
 
     @Value("${sign-request-token}")
     private String signRequestToken;
@@ -56,8 +49,8 @@ public class SignRequestServiceImpl implements SignRequestService {
     @Value("${sign-request-base-url}")
     private String signRequestBaseUrl;
 
-    @Value("${sign-request-documents-url}")
-    private String signRequestDocumentsUrl;
+    @Value("${sign-request-redirect-url}")
+    private String redirectUrl;
 
     private final WebClient webClient;
 
@@ -116,7 +109,7 @@ public class SignRequestServiceImpl implements SignRequestService {
 
     private SignRequestPayload buildRequest(byte[] encodedContent, String pdfName, AdminUserDTO user) {
         //        String redirectUrl = String.format("%s%s:%s", HTTPS, this.host, this.port);
-        String redirectUrl = String.format("%s%s", HTTPS, host);
+        //        String redirectUrl = String.format("%s%s", HTTPS, host);
         log.info("****** Re-direct Url****** :{}", redirectUrl);
         String urlToRedirectOnceSigned = redirectUrl + REDIRECT_URL_SIGNED;
         String urlToRedirectIfNotSigned = redirectUrl + REDIRECT_URL_NOT_SIGNED;

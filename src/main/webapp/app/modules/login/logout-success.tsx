@@ -1,16 +1,19 @@
+import { Alert, Button } from '@trussworks/react-uswds';
 import React from 'react';
-import { Alert } from 'reactstrap';
 import { getLoginUrl } from '../../../app/shared/util/url-utils';
 
 export const LogoutSuccess = () => {
   return (
-    <Alert type="success" heading="Logged out success">
-      You are logged out successfully! Click here to sign in with
-      <span>&nbsp;</span>
-      <a href={getLoginUrl()} className="alert-link">
-        LOGIN.GOV
+    <>
+      <Alert type="success" heading="Logout Successful" className="mt-5">
+        You are logged out successfully!
+      </Alert>
+      <a href={getLoginUrl()} key="signin" className="usa-nav__link">
+        <Button size="big" type="button" className="mt-5 mb-5">
+          <span>Sign in using Login.gov</span>
+        </Button>
       </a>
-    </Alert>
+    </>
   );
 };
 

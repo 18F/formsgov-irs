@@ -47,9 +47,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
 
-    private final SecurityProblemSupport problemSupport;
-
-    private final ClientRegistrationRepository clientRegistrationRepository;
+    //    private final SecurityProblemSupport problemSupport;
+    //
+    //    private final ClientRegistrationRepository clientRegistrationRepository;
 
     public SecurityConfiguration(
         CorsFilter corsFilter,
@@ -57,9 +57,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         SecurityProblemSupport problemSupport,
         ClientRegistrationRepository clientRegistrationRepository
     ) {
-        this.problemSupport = problemSupport;
+        //        this.problemSupport = problemSupport;
         this.jHipsterProperties = jHipsterProperties;
-        this.clientRegistrationRepository = clientRegistrationRepository;
+        //        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
         http.csrf().and().authorizeRequests()
-            .antMatchers("/", "api/account", "api/logout", "/logout-success","/*.woff2","/*.ttf", "/manifest.webapp", "/login**", "/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
+            .antMatchers("/", "api/logout", "/logout-success","/*.woff2","/*.ttf", "/manifest.webapp", "/login**", "/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
             .permitAll()
             .antMatchers("/form/**").authenticated()
             .anyRequest()
