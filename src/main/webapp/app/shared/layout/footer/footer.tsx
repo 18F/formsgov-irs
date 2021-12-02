@@ -9,10 +9,6 @@ const Footer = () => (
           IRS.gov
         </a>{' '}
         &nbsp;| &nbsp;
-        <a href="https://www.login.gov" target="_blank" rel="noopener noreferrer" className="usa-link">
-          login.gov
-        </a>{' '}
-        &nbsp;| &nbsp;
         <a href="https://forms.gov/" target="_blank" rel="noopener noreferrer" className="usa-link">
           Forms.gov
         </a>

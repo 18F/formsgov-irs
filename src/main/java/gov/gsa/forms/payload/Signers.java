@@ -23,11 +23,27 @@ public class Signers implements Serializable {
     @JsonProperty("embed_url_user_id")
     private String embedUrlUserId;
 
-    public Signers(String email, String firstName, String lastName, String embedUrlUserId) {
+    @JsonProperty("approve_only")
+    private boolean approveOnly = false;
+
+    @JsonProperty("notify_only")
+    private boolean notifyOnly = false;
+
+    private int order;
+
+    public Signers(String email, String firstName, String lastName, String embedUrlUserId, int order) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.embedUrlUserId = embedUrlUserId;
+        this.order = order;
+    }
+
+    public Signers(String email, String firstName, String lastName, int order) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.order = order;
     }
 
     public Signers() {}

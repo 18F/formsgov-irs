@@ -186,10 +186,11 @@ security.saml2:
 #irs-url = https://irs.sign-dev.forms.gov/api/v1/signrequest-quick-create/
 #sba-token = 003fe3c90ac3b980c6ccf9316dbcfca931ef3045
 #sba-url = https://irs.sign-dev.forms.gov/api/v1/signrequest-quick-create/
-sign-request-token: ${SIGN_REQUEST_TOKEN:92a939d0b78bcee555c5bcad13abde6df1c68973}
+sign-request-token: ${SIGN_REQUEST_TOKEN:}
 sign-request-base-url: ${SIGN_BASE_URL:https://irs.sign-dev.forms.gov/api/v1/}
 sign-request-create-url: ${SIGN_CREATE_URL:signrequest-quick-create/}
 sign-request-documents-url: ${SIGN_DOCUMENTS_URL:documents/}
 #IRS API
 irs-api-token: ${IRS_API_TOKEN:TLLANK29fUrzkXUjsnuDbEaB}
 irs-api-url: ${IRS_API_URL:https://iam-poc.wc2m.treasury.gov/iam/esignature/signatureForm}
+sign-event-callback-url: ${SIGN_EVENT_CALLBACK_URL:https://form-irs.app.cloud.gov/send-irs-payload}

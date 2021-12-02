@@ -16,11 +16,11 @@ const HeaderBar = (props: IHeaderProps) => {
   const [isOpen, setIsOpen] = useState([false, false]);
   const location = useLocation();
   const formsMenuItems = [
-    <Link to="/form/4506-T" key="4506-T">
-      form-4506T
+    <Link to="/form/12153" key="12153">
+      Form-12153
     </Link>,
-    <Link to="/8821" key="8821">
-      form-8821
+    <Link to="/form/12203" key="12203">
+      Form-12203
     </Link>,
   ];
 
@@ -46,7 +46,7 @@ const HeaderBar = (props: IHeaderProps) => {
             }}
             isOpen={isOpen[0]}
             label="Forms"
-            isCurrent={location.pathname === '/form/4506-T'}
+            isCurrent={location.pathname === '/form/12153' || location.pathname === '/form/12203'}
           />
           <Menu key="one" items={formsMenuItems} isOpen={isOpen[0]} id="formsDropDownOne" />
         </>

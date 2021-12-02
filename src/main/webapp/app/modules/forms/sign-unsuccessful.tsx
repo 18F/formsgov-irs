@@ -1,21 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import http from '../../shared/service/http-service';
 export const SignUnsuccessful = () => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      sendIrsPayload();
-      console.log('This will invoked after 30 second!');
-    }, 30000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const sendIrsPayload = async () => {
-    await http.get('api/send-irs-payload').then(response => {
-      /* eslint no-console: off */
-      console.log(response);
-    });
-  };
   return (
     <div style={{ marginBottom: '18.5rem', marginTop: '3rem' }}>
       <div className="usa-alert usa-alert--info">

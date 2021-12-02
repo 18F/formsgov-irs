@@ -11,7 +11,7 @@ import lombok.Data;
 public class SigningLog {
 
     private String id;
-    private String name;
+    private String name; //form-name-signing_log
     private String data;
     private String hash;
     private String declinedTimestamp;

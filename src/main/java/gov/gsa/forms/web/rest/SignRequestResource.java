@@ -3,6 +3,8 @@ package gov.gsa.forms.web.rest;
 import gov.gsa.forms.service.SignRequestService;
 import java.security.Principal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,14 +22,12 @@ public class SignRequestResource {
     public String signRequest(
         @RequestParam(name = "pdfUrl") String pdfUrl,
         @RequestParam(name = "pdfName") String pdfName,
+        @RequestParam(name = "taxpayerName2") String taxpayerName2,
+        @RequestParam(name = "taxpayerLastName2") String taxpayerLastName2,
+        @RequestParam(name = "taxpayer2Email") String taxpayer2Email,
         Principal principal
     ) {
         log.info("Pdf Url :{} and Pdf Name :{}", pdfUrl, pdfName);
-        return signRequest.executeSignRequest(pdfUrl, pdfName, principal);
-    }
-
-    @GetMapping(value = "/send-irs-payload")
-    public boolean sendIrsPayload() {
-        return signRequest.getSignedDocumentData();
+        return signRequest.executeSignRequest(pdfUrl, pdfName, principal, taxpayerName2, taxpayerLastName2, taxpayer2Email);
     }
 }

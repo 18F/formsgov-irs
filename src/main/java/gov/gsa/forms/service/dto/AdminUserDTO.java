@@ -50,4 +50,16 @@ public class AdminUserDTO implements Serializable {
     private Set<String> authorities;
 
     private UserAddress address;
+
+    private String formName;
+
+    @Size(max = 50)
+    private String taxpayer2FirstName;
+
+    @Size(max = 50)
+    private String taxpayer2LastName;
+
+    @Email
+    @Size(min = 5, max = 254)
+    private String taxpayer2Email;
 }

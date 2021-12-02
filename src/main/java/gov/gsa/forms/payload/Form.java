@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class Form {
 
-    private String id;
+    private String id; //uuid
     private String name;
     private String data;
     private String hash;

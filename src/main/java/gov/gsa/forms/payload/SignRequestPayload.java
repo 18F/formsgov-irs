@@ -33,6 +33,9 @@ public class SignRequestPayload implements Serializable {
     @JsonProperty("file_from_content_name")
     private String fileFromContentName;
 
+    @JsonProperty("who")
+    private String who = "mo";
+
     private List<Signers> signers;
 
     @JsonProperty("disable_date")

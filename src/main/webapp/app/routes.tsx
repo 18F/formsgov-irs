@@ -30,8 +30,8 @@ const Routes = () => {
         <ErrorBoundaryRoute path="/" exact component={Home} />
         <ErrorBoundaryRoute path="/logout-success" exact component={LogoutSuccess} />
         <ErrorBoundaryRoute path="/oauth2/authorization/oidc" component={LoginRedirect} />
-        <ErrorBoundaryRoute path="/form/4506-T" component={Forms} />
-        <ErrorBoundaryRoute path="/form/8821" component={Forms} />
+        <ErrorBoundaryRoute path="/form/12153" component={Forms} />
+        <ErrorBoundaryRoute path="/form/12203" component={Forms} />
         <ErrorBoundaryRoute component={PageNotFound} />
       </Switch>
     </div>

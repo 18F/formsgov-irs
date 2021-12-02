@@ -1,6 +1,5 @@
 package gov.gsa.forms.service;
 
-import gov.gsa.forms.payload.IRSFormPayload;
 import gov.gsa.forms.payload.SignRequestDocumentResponse;
 
 public interface IRSAPIService {

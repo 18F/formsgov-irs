@@ -14,15 +14,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.Principal;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.wildfly.common.Assert;
 import reactor.core.publisher.Mono;
 
 /**
@@ -38,6 +34,7 @@ public class SignRequestServiceImpl implements SignRequestService {
 
     private static final String REDIRECT_URL_SIGNED = "/sign-success";
     private static final String REDIRECT_URL_NOT_SIGNED = "/sign-unsuccessful";
+    private static final String DOCUMENTS = "documents/";
     private static final String USER = "user";
 
     @Value("${sign-request-token}")
@@ -52,6 +49,9 @@ public class SignRequestServiceImpl implements SignRequestService {
     @Value("${sign-request-redirect-url}")
     private String redirectUrl;
 
+    @Value("${sign-event-callback-url}")
+    private String eventCallBackUrl;
+
     private final WebClient webClient;
 
     private final HttpServletRequest request;
@@ -65,20 +65,25 @@ public class SignRequestServiceImpl implements SignRequestService {
     }
 
     @Override
-    public String executeSignRequest(String pdfUrl, String pdfName, Principal principal) {
+    public String executeSignRequest(String pdfUrl, String pdfName, Principal principal, String firstName, String lastName, String email) {
         try {
             URL url = new URL(pdfUrl);
             byte[] encoded = CommonUtil.encodePdfToByte(url);
             AdminUserDTO user = (AdminUserDTO) request.getSession().getAttribute(USER);
-            SignRequestPayload signRequestPayload = buildRequest(encoded, pdfName, user);
+            user.setFormName(pdfName);
+            user.setTaxpayer2FirstName(firstName);
+            user.setTaxpayer2LastName(lastName);
+            user.setTaxpayer2Email(email);
+            request.getSession().setAttribute("updated-user", user);
+            SignRequestPayload signRequestPayload = buildRequest(encoded, pdfName, user, firstName, lastName, email);
             String jsonString = ObjectMapperUtil.writeToJsonString(signRequestPayload);
             log.info("Sign Request JSON :{}", jsonString);
             String signRequestResponse = postRequest(jsonString).block();
             log.info("****** Sign Request Response :{}", signRequestResponse);
-            SignRequestDocumentResponse response = ObjectMapperUtil.readFromJson(signRequestResponse, SignRequestDocumentResponse.class);
-            Assert.assertNotNull(response);
-            SignRequestDTO signRequestDTO = new SignRequestDTO(response.getDocument());
-            request.getSession().setAttribute("signRequestDTO", signRequestDTO);
+            //            SignRequestDocumentResponse response = ObjectMapperUtil.readFromJson(signRequestResponse, SignRequestDocumentResponse.class);
+            //            Assert.assertNotNull(response);
+            //            SignRequestDTO signRequestDTO = new SignRequestDTO(response.getDocument());
+            //            request.getSession().setAttribute("signRequestDTO", signRequestDTO);
             return signRequestResponse;
         } catch (Exception e) {
             log.error("Error occurred executing SignRequest", e);
@@ -87,17 +92,24 @@ public class SignRequestServiceImpl implements SignRequestService {
     }
 
     @Override
-    public boolean getSignedDocumentData() {
-        SignRequestDTO signRequestDTO = (SignRequestDTO) request.getSession().getAttribute("signRequestDTO");
+    public boolean getSignedDocumentData(String docUUID) {
+        String signRequestUrl = signRequestBaseUrl + DOCUMENTS + docUUID + "/";
+        log.error("****** signRequestUrl :getSignedDocumentData: {} ", signRequestUrl);
+        //        SignRequestDTO signRequestDTO = (SignRequestDTO) request.getSession().getAttribute("signRequestDTO");
         try {
-            String signedDocumentJSON = getRequestDocument(signRequestDTO.getSignRequestDocumentUrl()).block();
+            if (docUUID == null) {
+                log.error("****** docUUID is null");
+                return false;
+            }
+            String signedDocumentJSON = getRequestDocument(signRequestUrl).block();
+            log.info("****** signed Document JSON , {}", signedDocumentJSON);
             SignRequestDocumentResponse signRequestDocumentResponse = ObjectMapperUtil.readFromJson(
                 signedDocumentJSON,
                 SignRequestDocumentResponse.class
             );
             if (signRequestDocumentResponse.getSigningLog() == null) {
                 signedDocumentJSON = getRequestDocument(signRequestDTO.getSignRequestDocumentUrl()).block();
-                log.info("****** Error occurred converting signedDocumentJSON , {}", signedDocumentJSON);
+                log.info("****** signed Document JSON , {}", signedDocumentJSON);
                 signRequestDocumentResponse = ObjectMapperUtil.readFromJson(signedDocumentJSON, SignRequestDocumentResponse.class);
             }
             irsAPIService.sendPayload(signRequestDocumentResponse);
@@ -107,13 +119,19 @@ public class SignRequestServiceImpl implements SignRequestService {
         return true;
     }
 
-    private SignRequestPayload buildRequest(byte[] encodedContent, String pdfName, AdminUserDTO user) {
-        //        String redirectUrl = String.format("%s%s:%s", HTTPS, this.host, this.port);
-        //        String redirectUrl = String.format("%s%s", HTTPS, host);
+    private SignRequestPayload buildRequest(
+        byte[] encodedContent,
+        String pdfName,
+        AdminUserDTO user,
+        String firstName,
+        String lastName,
+        String email
+    ) {
         log.info("****** Re-direct Url****** :{}", redirectUrl);
         String urlToRedirectOnceSigned = redirectUrl + REDIRECT_URL_SIGNED;
         String urlToRedirectIfNotSigned = redirectUrl + REDIRECT_URL_NOT_SIGNED;
-        Signers signers = new Signers(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail());
+        Signers firstSigner = new Signers(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail(), 0);
+        Signers secondSigner = new Signers(email, firstName, "", 1);
         return SignRequestPayloadBuilder
             .builder()
             .fromEmail(user.getEmail())
@@ -121,10 +139,11 @@ public class SignRequestServiceImpl implements SignRequestService {
             .redirectUrl(urlToRedirectOnceSigned)
             .redirectUrlDeclined(urlToRedirectIfNotSigned)
             .fileFromContent(encodedContent)
-            .eventsCallbackUrl(redirectUrl)
+            .eventsCallbackUrl(eventCallBackUrl)
             .fileFromContentName(pdfName)
             .disableDate(false)
-            .signers(List.of(signers))
+            .signers(List.of(firstSigner, secondSigner))
+            //            .signers(List.of(firstSigner))
             .build();
     }
 

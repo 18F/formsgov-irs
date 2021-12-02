@@ -10,7 +10,8 @@ export const LogoutSuccess = () => {
       </Alert>
       <a href={getLoginUrl()} key="signin" className="usa-nav__link">
         <Button size="big" type="button" className="mt-5 mb-5">
-          <span>Sign in using Login.gov</span>
+          <img src="content/images/logingov.png" alt="login.gov" className="mr-2" />
+          <span>Sign in with LOGIN.GOV</span>
         </Button>
       </a>
     </>

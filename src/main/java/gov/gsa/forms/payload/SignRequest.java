@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 public class SignRequest {
 
-    public String from_email;
-    public String from_email_name;
-    public boolean is_being_prepared;
-    public String redirect_url;
-    public String redirect_url_declined;
+    private String from_email;
+    private String from_email_name;
+    private boolean is_being_prepared;
+    private String redirect_url;
+    private String redirect_url_declined;
     //    public List<Object> required_attachments;
-    public List<Signers> signers;
-    public String uuid;
+    private List<Signers> signers;
+    private String uuid;
 }

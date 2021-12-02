@@ -1,11 +1,9 @@
 package gov.gsa.forms.config;
 
-import gov.gsa.forms.security.*;
 import gov.gsa.forms.security.SecurityUtils;
 import gov.gsa.forms.security.oauth2.AudienceValidator;
 import gov.gsa.forms.security.oauth2.CustomClaimConverter;
 import gov.gsa.forms.security.oauth2.JwtGrantedAuthorityConverter;
-import java.net.URI;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -19,21 +17,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
-import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
-import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 import tech.jhipster.config.JHipsterProperties;
 
@@ -47,19 +38,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
 
-    //    private final SecurityProblemSupport problemSupport;
-    //
-    //    private final ClientRegistrationRepository clientRegistrationRepository;
-
     public SecurityConfiguration(
-        CorsFilter corsFilter,
         JHipsterProperties jHipsterProperties,
         SecurityProblemSupport problemSupport,
         ClientRegistrationRepository clientRegistrationRepository
     ) {
-        //        this.problemSupport = problemSupport;
         this.jHipsterProperties = jHipsterProperties;
-        //        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Override
@@ -77,7 +61,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
-        http.csrf().and().authorizeRequests()
+        http.csrf().disable()
+            .authorizeRequests()
+            .antMatchers( "/send-irs-payload")
+            .permitAll()
             .antMatchers("/", "api/logout", "/logout-success","/*.woff2","/*.ttf", "/manifest.webapp", "/login**", "/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
             .permitAll()
             .antMatchers("/form/**").authenticated()

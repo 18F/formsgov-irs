@@ -4,19 +4,33 @@ import { Form } from 'react-formio';
 import uswds from '@formio/uswds';
 import { Formio } from 'formiojs';
 import http from '../../shared/service/http-service';
-import { Spinner } from '../../shared/util/utils';
 import { useAppSelector } from '../../../app/config/store';
 import LoadingOverlay from 'react-loading-overlay';
 import { FadeLoader } from 'react-spinners';
+import { useLocation } from 'react-router-dom';
 Formio.use(uswds);
 export const Forms = () => {
   const [submissionId, setSubmissionId] = useState(0);
   const [jwtToken, setJwtToken] = useState(0);
   const [user, setUser] = useState({});
   const [embedUrl, setEmbedUrl] = useState('');
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState(true);
   const account = useAppSelector(state => state.authentication.account);
-  const xAllow = `GET:/project/611bd732192fb363527df70d/form/6152179c7e96b7d08f0333bb/submission/${submissionId}/download`;
+  const location = useLocation();
+  const formioEnvId = '611bd732192fb363527df70d';
+  const formId =
+    location.pathname === '/form/12153'
+      ? '619032a70781a17f63a71edb'
+      : location.pathname === '/form/12203'
+      ? '6195555c3bd148bde37a4ad1'
+      : '';
+  const formSrc =
+    location.pathname === '/form/12153'
+      ? 'https://portal-test.forms.gov/agencydemo-dev/irsform12153'
+      : location.pathname === '/form/12203'
+      ? 'https://portal-test.forms.gov/agencydemo-dev/irsform12203'
+      : '';
+  let formData;
   useEffect(() => {
     login();
     getUser();
@@ -25,7 +39,7 @@ export const Forms = () => {
   const requestData = {
     data: {
       email: 'service@gsa.gov',
-      password: 'vBEJbMK6DAydFjBitmLbB4ndBhHZpm',
+      password: '',
     },
   };
   const login = async () => {
@@ -45,6 +59,7 @@ export const Forms = () => {
 
   const getATokenKeyAndSign = async () => {
     console.log('jwtToken **** ' + jwtToken);
+    const xAllow = `GET:/project/${formioEnvId}/form/${formId}/submission/${submissionId}/download`;
     await http
       .get('https://portal-test.forms.gov/agencydemo-dev/token', {
         headers: {
@@ -60,8 +75,10 @@ export const Forms = () => {
   };
   const handleOnSubmitDone = e => {
     /* eslint no-console: off */
-    console.log('handleOnSubmitDone ' + e);
+    console.log('handleOnSubmitDone ' + JSON.stringify(e.data));
+    formData = e.data;
     getATokenKeyAndSign();
+    setLoader(false);
   };
   const handleOnSubmit = event => {
     setSubmissionId(event._id);
@@ -71,13 +88,18 @@ export const Forms = () => {
   };
 
   const getSignedRequest = async key => {
-    const pdfUrl =
-      'https://portal-test.forms.gov/agencydemo-dev/form/6152179c7e96b7d08f0333bb/submission/' + submissionId + '/download?token=' + key;
-    const pdfName = '4506t.pdf';
+    const form = location.pathname.substring(6);
+    const pdfUrl = `https://portal-test.forms.gov/agencydemo-dev/form/${formId}/submission/${submissionId}/download?token=${key}`;
+    const pdfName = `${form}.pdf`;
+    const taxpayerName2 = formData.taxpayerName2;
+    const taxpayer2Email = formData.taxpayer2Email;
     const { data: response } = await http.get('api/sign', {
       params: {
         pdfUrl,
         pdfName,
+        taxpayerName2,
+        taxpayerLastName2: '',
+        taxpayer2Email,
       },
     });
     /* eslint no-console: off */
@@ -86,22 +108,24 @@ export const Forms = () => {
     setEmbedUrl(embed_url);
   };
 
-  // const handelOnRender = () => {
-  //   setLoader(false);
-  // };
+  const handelOnFormReady = () => {
+    setLoader(submissionId !== 0);
+  };
 
   const phone = user['phone'];
   const formattedPhone = phone !== undefined ? phone.replace(/\D+/g, '').replace(/^(\d{3})(\d{3})(\d{4}).*/, '($1) $2-$3') : '';
+  const form12153 = location.pathname === '/form/12153';
   const submissionData = {
     data: {
-      name1: account.firstName + ' ' + account.lastName,
+      taxpayerName1: account.firstName + ' ' + account.lastName,
       // taxpayerLastName: user['lastName'],
-      currentNameAndAddress: account.firstName + ' ' + account.lastName + ' , ' + account.formatted,
-      // taxpayerCity: user['city'],
-      // taxpayerZip: user['zipcode'],
-      // taxpayerState: user['state'],
-      // taxpayerDaytimePhoneNumber: formattedPhone,
-      socialSecurityNumber: account.ssn,
+      // ...(form12153 ? { currentaddress1: account.formatted, } : { mailingAddress: account.formatted }),
+      // currentNameAndAddress: account.firstName + ' ' + account.lastName + ' , ' + account.formatted,
+      // city1: user['city'],
+      // zipCode1: user['zipcode'],
+      // state1: user['state'],
+      // phoneNumber1: formattedPhone,
+      // socialSecurityNumber: account.ssn,
     },
   };
   return (
@@ -112,10 +136,11 @@ export const Forms = () => {
     >
       {embedUrl === '' ? (
         <Form
-          src="https://portal-test.forms.gov/agencydemo-dev/4506t"
+          src={formSrc}
           onSubmitDone={handleOnSubmitDone}
           onSubmit={handleOnSubmit}
           submission={submissionData}
+          onRender={handelOnFormReady}
         />
       ) : (
         (window.location.href = embedUrl)
