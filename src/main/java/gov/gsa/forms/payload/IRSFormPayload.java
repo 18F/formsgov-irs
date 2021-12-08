@@ -11,6 +11,6 @@ public class IRSFormPayload {
     private String token;
     private List<Signature> signatures;
     private Form form;
-    private SigningLog signingLog;
+    private SigningLogPayload signingLog;
     private List<Attachment> attachments;
 }

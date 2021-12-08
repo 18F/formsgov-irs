@@ -3,18 +3,16 @@ package gov.gsa.forms.service.impl;
 import gov.gsa.forms.payload.*;
 import gov.gsa.forms.payload.builder.IRSFormPayloadBuilder;
 import gov.gsa.forms.service.IRSAPIService;
-import gov.gsa.forms.service.dto.AdminUserDTO;
 import gov.gsa.forms.util.CommonUtil;
 import gov.gsa.forms.util.ObjectMapperUtil;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +38,10 @@ public class IRSAPIServiceImpl implements IRSAPIService {
     private static final String TRANS_TYPE = "GSA_DocId";
 
     private static final String INTENT_ID = "0";
+
     public static final String USER_AGENT = "User-Agent";
-    public static final String USER = "updated-user";
+
+    public static final String ENCODED_PDF_PREFIX = "data:application/pdf;base64,";
 
     @Value("${irs-api-token}")
     private String apiToken;
@@ -61,15 +61,30 @@ public class IRSAPIServiceImpl implements IRSAPIService {
     @Override
     public boolean sendPayload(SignRequestDocumentResponse signRequestDocumentResponse) {
         try {
-            URL urlPdf = new URL(signRequestDocumentResponse.getFileAsPdf());
-            URL urlSigningLog = new URL(signRequestDocumentResponse.getSigningLog().getPdf());
+            URL urlPdf = new URL(signRequestDocumentResponse.getDocument().getPdf());
+            log.info("****** urlPdf ****** :{}", urlPdf);
+            URL urlSigningLog = new URL(signRequestDocumentResponse.getDocument().getSigningLog().getPdf());
             byte[] encodedPdf = CommonUtil.encodePdfToByte(urlPdf);
-            String stringPdf = Base64.getEncoder().encodeToString(encodedPdf);
+            String base64stringPdf = Base64.getEncoder().encodeToString(encodedPdf);
+
+            StringBuilder base64stringPdfBuilder = new StringBuilder(ENCODED_PDF_PREFIX);
+            base64stringPdfBuilder.append(base64stringPdf);
+            log.info("****** Base64 ****** :{}", base64stringPdfBuilder);
+
+            StringBuilder base64stringLogPdfBuilder = new StringBuilder(ENCODED_PDF_PREFIX);
             byte[] encodedSigningLogPdf = CommonUtil.encodePdfToByte(urlSigningLog);
             String stringSigningLogPdf = Base64.getEncoder().encodeToString(encodedSigningLogPdf);
-            IRSFormPayload irsFormPayload = buildPayload(signRequestDocumentResponse, stringPdf, stringSigningLogPdf);
+            base64stringLogPdfBuilder.append(stringSigningLogPdf);
+
+            IRSFormPayload irsFormPayload = buildPayload(
+                signRequestDocumentResponse,
+                base64stringPdfBuilder.toString(),
+                base64stringLogPdfBuilder.toString()
+            );
             String jsonString = ObjectMapperUtil.writeToJsonString(irsFormPayload);
+
             log.info("****** IRS outbound payload ****** :{}", jsonString);
+
             String irsResponse = postRequest(jsonString).block();
             log.info("****** IRS API post response ******: {}", irsResponse);
         } catch (IOException e) {
@@ -86,12 +101,27 @@ public class IRSAPIServiceImpl implements IRSAPIService {
         String ipAddress = request.getRemoteAddr();
         String userAgent = request.getHeader(USER_AGENT);
         String sessionId = request.getSession().getId();
-        AdminUserDTO user = (AdminUserDTO) request.getSession().getAttribute(USER);
+        //first signer
+        String firstSignerName = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(0).getFirstName();
+        String firstSignerLastName = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(0).getLastName();
+        String firstSignerEmail = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(0).getEmail();
+        //second signer
+        int size = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().size();
+        String secondSignerName = size > 1
+            ? signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getFirstName()
+            : "";
+        String secondSignerLastName = size > 1
+            ? signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getLastName()
+            : "";
+        String secondSignerEmail = size > 1
+            ? signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getEmail()
+            : "";
+
         Signature signature1 = new Signature(
             ID_TYPE,
-            signRequestDocumentResponse.getSignrequest().getUuid(),
-            user.getFirstName() + " " + user.getLastName(),
-            user.getEmail(),
+            signRequestDocumentResponse.getDocument().getSignrequest().getUuid(),
+            firstSignerName + " " + firstSignerLastName,
+            firstSignerEmail,
             ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),
             ipAddress,
             userAgent,
@@ -105,9 +135,9 @@ public class IRSAPIServiceImpl implements IRSAPIService {
         );
         Signature signature2 = new Signature(
             ID_TYPE,
-            signRequestDocumentResponse.getSignrequest().getUuid(),
-            user.getTaxpayer2FirstName() + " " + user.getTaxpayer2LastName(),
-            user.getTaxpayer2Email(),
+            signRequestDocumentResponse.getDocument().getSignrequest().getUuid(),
+            secondSignerName + " " + secondSignerLastName,
+            secondSignerEmail,
             ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),
             ipAddress,
             userAgent,
@@ -120,16 +150,16 @@ public class IRSAPIServiceImpl implements IRSAPIService {
             INTENT_ID
         );
         Form form = new Form(
-            signRequestDocumentResponse.getDocumentId(),
-            user.getFormName(),
+            signRequestDocumentResponse.getDocument().getDocumentId(),
+            signRequestDocumentResponse.getDocument().getName(),
             encodedPdf,
-            signRequestDocumentResponse.getSecurityHash()
+            signRequestDocumentResponse.getDocument().getSecurityHash()
         );
-        SigningLog signingLog = new SigningLog(
+        SigningLogPayload signingLog = new SigningLogPayload(
             signRequestDocumentResponse.getUuid(),
-            user.getFormName() + "_signing_log",
+            "signing_log_" + signRequestDocumentResponse.getDocument(),
             encodedSigningLogPdf,
-            signRequestDocumentResponse.getSigningLog().getHash(),
+            signRequestDocumentResponse.getDocument().getSigningLog().getHash(),
             "",
             ""
         );

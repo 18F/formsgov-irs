@@ -10,14 +10,10 @@ import lombok.Data;
 @Data
 public class SignRequestDocumentResponse {
 
-    private String document;
+    //    private String document;
     private String url;
     private String uuid;
     private String user;
-
-    @JsonProperty("file_as_pdf")
-    private String fileAsPdf;
-
     private String name;
 
     @JsonProperty("external_id")
@@ -27,14 +23,43 @@ public class SignRequestDocumentResponse {
     private String pdf;
     private String status;
     private SignRequest signrequest;
-
-    @JsonProperty("signing_log")
     private SigningLog signingLog;
 
-    @JsonProperty("security_hash")
-    private String securityHash;
+    @JsonProperty("event_type")
+    private String eventType;
 
-    @JsonProperty("short_id")
-    private String documentId;
+    private Team team;
+    private Document document;
+
+    @Data
+    private static class Team {
+
+        private String name;
+        private String subdomain;
+        private String url;
+    }
+
+    @Data
+    public static class Document {
+
+        private String name;
+        private Team team;
+        private String uuid;
+        private SignRequest signrequest;
+
+        @JsonProperty("signing_log")
+        private SigningLog signingLog;
+
+        @JsonProperty("security_hash")
+        private String securityHash;
+
+        @JsonProperty("file_as_pdf")
+        private String fileAsPdf;
+
+        @JsonProperty("short_id")
+        private String documentId;
+
+        private String pdf;
+    }
     // private List<Object> attachments;
 }

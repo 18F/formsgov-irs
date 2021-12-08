@@ -1,16 +1,13 @@
 package gov.gsa.forms.service.impl;
 
-import gov.gsa.forms.payload.SignRequestDocumentResponse;
 import gov.gsa.forms.payload.SignRequestPayload;
 import gov.gsa.forms.payload.Signers;
 import gov.gsa.forms.payload.builder.SignRequestPayloadBuilder;
 import gov.gsa.forms.service.IRSAPIService;
 import gov.gsa.forms.service.SignRequestService;
 import gov.gsa.forms.service.dto.AdminUserDTO;
-import gov.gsa.forms.service.dto.SignRequestDTO;
 import gov.gsa.forms.util.CommonUtil;
 import gov.gsa.forms.util.ObjectMapperUtil;
-import java.io.IOException;
 import java.net.URL;
 import java.security.Principal;
 import java.util.List;
@@ -36,6 +33,7 @@ public class SignRequestServiceImpl implements SignRequestService {
     private static final String REDIRECT_URL_NOT_SIGNED = "/sign-unsuccessful";
     private static final String DOCUMENTS = "documents/";
     private static final String USER = "user";
+    private static final String FORM_DATA = "form-data";
 
     @Value("${sign-request-token}")
     private String signRequestToken;
@@ -70,20 +68,11 @@ public class SignRequestServiceImpl implements SignRequestService {
             URL url = new URL(pdfUrl);
             byte[] encoded = CommonUtil.encodePdfToByte(url);
             AdminUserDTO user = (AdminUserDTO) request.getSession().getAttribute(USER);
-            user.setFormName(pdfName);
-            user.setTaxpayer2FirstName(firstName);
-            user.setTaxpayer2LastName(lastName);
-            user.setTaxpayer2Email(email);
-            request.getSession().setAttribute("updated-user", user);
             SignRequestPayload signRequestPayload = buildRequest(encoded, pdfName, user, firstName, lastName, email);
             String jsonString = ObjectMapperUtil.writeToJsonString(signRequestPayload);
             log.info("Sign Request JSON :{}", jsonString);
             String signRequestResponse = postRequest(jsonString).block();
             log.info("****** Sign Request Response :{}", signRequestResponse);
-            //            SignRequestDocumentResponse response = ObjectMapperUtil.readFromJson(signRequestResponse, SignRequestDocumentResponse.class);
-            //            Assert.assertNotNull(response);
-            //            SignRequestDTO signRequestDTO = new SignRequestDTO(response.getDocument());
-            //            request.getSession().setAttribute("signRequestDTO", signRequestDTO);
             return signRequestResponse;
         } catch (Exception e) {
             log.error("Error occurred executing SignRequest", e);
@@ -91,33 +80,32 @@ public class SignRequestServiceImpl implements SignRequestService {
         return "";
     }
 
-    @Override
-    public boolean getSignedDocumentData(String docUUID) {
-        String signRequestUrl = signRequestBaseUrl + DOCUMENTS + docUUID + "/";
-        log.error("****** signRequestUrl :getSignedDocumentData: {} ", signRequestUrl);
-        //        SignRequestDTO signRequestDTO = (SignRequestDTO) request.getSession().getAttribute("signRequestDTO");
-        try {
-            if (docUUID == null) {
-                log.error("****** docUUID is null");
-                return false;
-            }
-            String signedDocumentJSON = getRequestDocument(signRequestUrl).block();
-            log.info("****** signed Document JSON , {}", signedDocumentJSON);
-            SignRequestDocumentResponse signRequestDocumentResponse = ObjectMapperUtil.readFromJson(
-                signedDocumentJSON,
-                SignRequestDocumentResponse.class
-            );
-            if (signRequestDocumentResponse.getSigningLog() == null) {
-                signedDocumentJSON = getRequestDocument(signRequestDTO.getSignRequestDocumentUrl()).block();
-                log.info("****** signed Document JSON , {}", signedDocumentJSON);
-                signRequestDocumentResponse = ObjectMapperUtil.readFromJson(signedDocumentJSON, SignRequestDocumentResponse.class);
-            }
-            irsAPIService.sendPayload(signRequestDocumentResponse);
-        } catch (IOException e) {
-            log.error("****** Error occurred converting signedDocumentJSON");
-        }
-        return true;
-    }
+    //    @Override
+    //    public boolean getSignedDocumentData(String docUUID) {
+    //        String signRequestUrl = signRequestBaseUrl + DOCUMENTS + docUUID + "/";
+    //        log.info("****** signRequestUrl :getSignedDocumentData: {} ", signRequestUrl);
+    //        try {
+    //            if (docUUID == null) {
+    //                log.error("****** docUUID is null");
+    //                return false;
+    //            }
+    //            String signedDocumentJSON = getRequestDocument(signRequestUrl).block();
+    //            log.info("****** Signed Document Data JSON , {}", signedDocumentJSON);
+    //            SignRequestDocumentResponse signRequestDocumentResponse = ObjectMapperUtil.readFromJson(
+    //                signedDocumentJSON,
+    //                SignRequestDocumentResponse.class
+    //            );
+    //            if (signRequestDocumentResponse.getSigningLog() == null) {
+    //                signedDocumentJSON = getRequestDocument(signRequestUrl).block();
+    //                log.info("****** signed Document JSON , {}", signedDocumentJSON);
+    //                signRequestDocumentResponse = ObjectMapperUtil.readFromJson(signedDocumentJSON, SignRequestDocumentResponse.class);
+    //            }
+    //            irsAPIService.sendPayload(signRequestDocumentResponse);
+    //        } catch (IOException e) {
+    //            log.error("****** Error occurred converting signedDocumentJSON");
+    //        }
+    //        return true;
+    //    }
 
     private SignRequestPayload buildRequest(
         byte[] encodedContent,

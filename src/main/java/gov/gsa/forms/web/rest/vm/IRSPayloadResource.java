@@ -1,8 +1,7 @@
 package gov.gsa.forms.web.rest.vm;
 
 import gov.gsa.forms.payload.SignRequestDocumentResponse;
-import gov.gsa.forms.payload.SignRequestEventCallbackResponse;
-import gov.gsa.forms.service.SignRequestService;
+import gov.gsa.forms.service.IRSAPIService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -18,18 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class IRSPayloadResource {
 
     public static final String SIGNED = "signed";
-    private final SignRequestService signRequest;
+    private final IRSAPIService irsAPIService;
 
-    public IRSPayloadResource(SignRequestService signRequest) {
-        this.signRequest = signRequest;
+    public IRSPayloadResource(IRSAPIService irsAPIService) {
+        this.irsAPIService = irsAPIService;
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<String> sendIrsPayload(@RequestBody SignRequestEventCallbackResponse response) {
-        log.info("Sign request event call back response: {}", response);
-        if (StringUtils.equals(SIGNED, response.getEventType())) {
-            boolean signedDocument = signRequest.getSignedDocumentData(response.getDocument().getUuid());
-            return new ResponseEntity<>(String.valueOf(signedDocument), HttpStatus.OK);
+    public ResponseEntity<String> sendIrsPayload(@RequestBody SignRequestDocumentResponse documentResponseresponse) {
+        log.info("Sign request event call back response: {}", documentResponseresponse);
+        if (StringUtils.equals(SIGNED, documentResponseresponse.getEventType())) {
+            boolean response = irsAPIService.sendPayload(documentResponseresponse);
+            return new ResponseEntity<>(String.valueOf(response), HttpStatus.OK);
         }
         return new ResponseEntity<>("false", HttpStatus.OK);
     }

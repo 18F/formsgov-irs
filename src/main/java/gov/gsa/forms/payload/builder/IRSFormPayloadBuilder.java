@@ -34,7 +34,7 @@ public class IRSFormPayloadBuilder {
         return this;
     }
 
-    public IRSFormPayloadBuilder signingLog(SigningLog signingLog) {
+    public IRSFormPayloadBuilder signingLog(SigningLogPayload signingLog) {
         payload.setSigningLog(signingLog);
         return this;
     }
