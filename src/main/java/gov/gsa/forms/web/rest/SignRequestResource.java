@@ -3,9 +3,10 @@ package gov.gsa.forms.web.rest;
 import gov.gsa.forms.service.SignRequestService;
 import java.security.Principal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -25,9 +26,10 @@ public class SignRequestResource {
         @RequestParam(name = "taxpayerName2") String taxpayerName2,
         @RequestParam(name = "taxpayerLastName2") String taxpayerLastName2,
         @RequestParam(name = "taxpayer2Email") String taxpayer2Email,
+        @RequestParam(name = "jointRequest") String jointRequest,
         Principal principal
     ) {
         log.info("Pdf Url :{} and Pdf Name :{}", pdfUrl, pdfName);
-        return signRequest.executeSignRequest(pdfUrl, pdfName, principal, taxpayerName2, taxpayerLastName2, taxpayer2Email);
+        return signRequest.executeSignRequest(pdfUrl, pdfName, principal, taxpayerName2, taxpayerLastName2, taxpayer2Email, jointRequest);
     }
 }

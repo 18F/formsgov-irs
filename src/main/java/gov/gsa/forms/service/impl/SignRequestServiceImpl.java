@@ -10,10 +10,12 @@ import gov.gsa.forms.util.CommonUtil;
 import gov.gsa.forms.util.ObjectMapperUtil;
 import java.net.URL;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -34,6 +36,7 @@ public class SignRequestServiceImpl implements SignRequestService {
     private static final String DOCUMENTS = "documents/";
     private static final String USER = "user";
     private static final String FORM_DATA = "form-data";
+    public static final String YES = "yes";
 
     @Value("${sign-request-token}")
     private String signRequestToken;
@@ -63,12 +66,20 @@ public class SignRequestServiceImpl implements SignRequestService {
     }
 
     @Override
-    public String executeSignRequest(String pdfUrl, String pdfName, Principal principal, String firstName, String lastName, String email) {
+    public String executeSignRequest(
+        String pdfUrl,
+        String pdfName,
+        Principal principal,
+        String firstName,
+        String lastName,
+        String email,
+        String jointRequest
+    ) {
         try {
             URL url = new URL(pdfUrl);
             byte[] encoded = CommonUtil.encodePdfToByte(url);
             AdminUserDTO user = (AdminUserDTO) request.getSession().getAttribute(USER);
-            SignRequestPayload signRequestPayload = buildRequest(encoded, pdfName, user, firstName, lastName, email);
+            SignRequestPayload signRequestPayload = buildRequest(encoded, pdfName, user, firstName, lastName, email, jointRequest);
             String jsonString = ObjectMapperUtil.writeToJsonString(signRequestPayload);
             log.info("Sign Request JSON :{}", jsonString);
             String signRequestResponse = postRequest(jsonString).block();
@@ -111,15 +122,16 @@ public class SignRequestServiceImpl implements SignRequestService {
         byte[] encodedContent,
         String pdfName,
         AdminUserDTO user,
-        String firstName,
-        String lastName,
-        String email
+        String taxPayer2FirstName,
+        String taxPayer2LastName,
+        String taxPayer2Email,
+        String jointRequest
     ) {
         log.info("****** Re-direct Url****** :{}", redirectUrl);
         String urlToRedirectOnceSigned = redirectUrl + REDIRECT_URL_SIGNED;
         String urlToRedirectIfNotSigned = redirectUrl + REDIRECT_URL_NOT_SIGNED;
-        Signers firstSigner = new Signers(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail(), 0);
-        Signers secondSigner = new Signers(email, firstName, "", 1);
+        List<Signers> signers = new ArrayList<>();
+        buildSigners(signers, jointRequest, user, taxPayer2FirstName, taxPayer2Email);
         return SignRequestPayloadBuilder
             .builder()
             .fromEmail(user.getEmail())
@@ -130,9 +142,25 @@ public class SignRequestServiceImpl implements SignRequestService {
             .eventsCallbackUrl(eventCallBackUrl)
             .fileFromContentName(pdfName)
             .disableDate(false)
-            .signers(List.of(firstSigner, secondSigner))
-            //            .signers(List.of(firstSigner))
+            .signers(signers)
             .build();
+    }
+
+    private void buildSigners(
+        List<Signers> signers,
+        String jointRequest,
+        AdminUserDTO user,
+        String taxPayer2FirstName,
+        String taxPayer2Email
+    ) {
+        Signers firstSigner = new Signers(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail(), 0);
+        Signers secondSigner = new Signers(taxPayer2Email, taxPayer2FirstName, "", 1);
+        if (StringUtils.equals(jointRequest, YES)) {
+            signers.add(firstSigner);
+            signers.add(secondSigner);
+        } else {
+            signers.add(firstSigner);
+        }
     }
 
     private Mono<String> postRequest(String reqBody) {

@@ -17,25 +17,41 @@ export const Forms = () => {
   const [loader, setLoader] = useState(true);
   const account = useAppSelector(state => state.authentication.account);
   const location = useLocation();
-  const formioEnvId = '611bd732192fb363527df70d';
-  const formId =
+  // dev stage
+  const formioDevEnvId = '611bd732192fb363527df70d';
+  const formDevId =
     location.pathname === '/form/12153'
       ? '619032a70781a17f63a71edb'
       : location.pathname === '/form/12203'
       ? '6195555c3bd148bde37a4ad1'
       : '';
-  const formSrc =
+  // test stage
+  const formioTestEnvId = '611fd1912bfe471258edcb15';
+  const formTestId =
+    location.pathname === '/form/12153'
+      ? '61b2b556b586744c7d3cf8b9'
+      : location.pathname === '/form/12203'
+      ? '61b2b537d413a9756918a9ab'
+      : '';
+  const formSrcDev =
     location.pathname === '/form/12153'
       ? 'https://portal-test.forms.gov/agencydemo-dev/irsform12153'
       : location.pathname === '/form/12203'
       ? 'https://portal-test.forms.gov/agencydemo-dev/irsform12203'
       : '';
+  const formSrcTest =
+    location.pathname === '/form/12153'
+      ? 'https://portal-test.forms.gov/agencydemo-test/irsform12153'
+      : location.pathname === '/form/12203'
+      ? 'https://portal-test.forms.gov/agencydemo-test/irsform12203'
+      : '';
   let formData;
+  const formioEnv = 'agencydemo-test';
+
   useEffect(() => {
     login();
     getUser();
   }, []);
-
   const requestData = {
     data: {
       email: 'service@gsa.gov',
@@ -43,7 +59,7 @@ export const Forms = () => {
     },
   };
   const login = async () => {
-    await http.post('https://portal-test.forms.gov/agencydemo-dev/admin/login', requestData).then(response => {
+    await http.post(`https://portal-test.forms.gov/${formioEnv}/admin/login`, requestData).then(response => {
       setJwtToken(response.headers['x-jwt-token']);
       /* eslint no-console: off */
       console.log(response.status);
@@ -59,9 +75,9 @@ export const Forms = () => {
 
   const getATokenKeyAndSign = async () => {
     console.log('jwtToken **** ' + jwtToken);
-    const xAllow = `GET:/project/${formioEnvId}/form/${formId}/submission/${submissionId}/download`;
+    const xAllow = `GET:/project/${formioTestEnvId}/form/${formTestId}/submission/${submissionId}/download`;
     await http
-      .get('https://portal-test.forms.gov/agencydemo-dev/token', {
+      .get(`https://portal-test.forms.gov/${formioEnv}/token`, {
         headers: {
           'x-jwt-token': jwtToken,
           'x-allow': xAllow,
@@ -89,10 +105,11 @@ export const Forms = () => {
 
   const getSignedRequest = async key => {
     const form = location.pathname.substring(6);
-    const pdfUrl = `https://portal-test.forms.gov/agencydemo-dev/form/${formId}/submission/${submissionId}/download?token=${key}`;
+    const pdfUrl = `https://portal-test.forms.gov/${formioEnv}/form/${formTestId}/submission/${submissionId}/download?token=${key}`;
     const pdfName = `${form}.pdf`;
-    const taxpayerName2 = formData.taxpayerName2;
-    const taxpayer2Email = formData.taxpayer2Email;
+    const taxpayerName2 = formData.taxpayerName2 ? formData.taxpayerName2 : '';
+    const taxpayer2Email = formData.taxpayer2Email ? formData.taxpayer2Email : '';
+    const jointRequest = formData.jointRequest;
     const { data: response } = await http.get('api/sign', {
       params: {
         pdfUrl,
@@ -100,6 +117,7 @@ export const Forms = () => {
         taxpayerName2,
         taxpayerLastName2: '',
         taxpayer2Email,
+        jointRequest,
       },
     });
     /* eslint no-console: off */
@@ -136,7 +154,7 @@ export const Forms = () => {
     >
       {embedUrl === '' ? (
         <Form
-          src={formSrc}
+          src={formSrcTest}
           onSubmitDone={handleOnSubmitDone}
           onSubmit={handleOnSubmit}
           submission={submissionData}
