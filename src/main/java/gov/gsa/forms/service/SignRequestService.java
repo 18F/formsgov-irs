@@ -12,5 +12,6 @@ public interface SignRequestService {
         String email,
         String jointRequest
     );
-    //    boolean getSignedDocumentData(String docUUID);
+
+    boolean getSignedDocumentData(String docUUID);
 }

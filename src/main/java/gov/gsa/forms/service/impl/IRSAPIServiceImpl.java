@@ -10,6 +10,7 @@ import java.net.URL;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -105,18 +106,7 @@ public class IRSAPIServiceImpl implements IRSAPIService {
         String firstSignerName = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(0).getFirstName();
         String firstSignerLastName = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(0).getLastName();
         String firstSignerEmail = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(0).getEmail();
-        //second signer
-        int size = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().size();
-        String secondSignerName = size > 1
-            ? signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getFirstName()
-            : "";
-        String secondSignerLastName = size > 1
-            ? signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getLastName()
-            : "";
-        String secondSignerEmail = size > 1
-            ? signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getEmail()
-            : "";
-
+        List<Signature> signatures = new ArrayList<>();
         Signature signature1 = new Signature(
             ID_TYPE,
             signRequestDocumentResponse.getDocument().getSignrequest().getUuid(),
@@ -133,22 +123,32 @@ public class IRSAPIServiceImpl implements IRSAPIService {
             TRANS_TYPE,
             INTENT_ID
         );
-        Signature signature2 = new Signature(
-            ID_TYPE,
-            signRequestDocumentResponse.getDocument().getSignrequest().getUuid(),
-            secondSignerName + " " + secondSignerLastName,
-            secondSignerEmail,
-            ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),
-            ipAddress,
-            userAgent,
-            sessionId,
-            AUTHENTICATION_TYPE,
-            AUTHENTICATION_LEVEL,
-            AUTHENTICATION_ID,
-            CLIENT_APP,
-            TRANS_TYPE,
-            INTENT_ID
-        );
+        signatures.add(signature1);
+        //second signer
+        int size = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().size();
+        if (size > 1) {
+            String secondSignerName = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getFirstName();
+            String secondSignerLastName = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getLastName();
+            String secondSignerEmail = signRequestDocumentResponse.getDocument().getSignrequest().getSigners().get(1).getEmail();
+            Signature signature2 = new Signature(
+                ID_TYPE,
+                signRequestDocumentResponse.getDocument().getSignrequest().getUuid(),
+                secondSignerName + " " + secondSignerLastName,
+                secondSignerEmail,
+                ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),
+                ipAddress,
+                userAgent,
+                sessionId,
+                AUTHENTICATION_TYPE,
+                AUTHENTICATION_LEVEL,
+                AUTHENTICATION_ID,
+                CLIENT_APP,
+                TRANS_TYPE,
+                INTENT_ID
+            );
+            signatures.add(signature2);
+        }
+
         Form form = new Form(
             signRequestDocumentResponse.getDocument().getDocumentId(),
             signRequestDocumentResponse.getDocument().getName(),
@@ -166,7 +166,7 @@ public class IRSAPIServiceImpl implements IRSAPIService {
         return IRSFormPayloadBuilder
             .builder()
             .token(apiToken)
-            .signatures(List.of(signature1, signature2))
+            .signatures(signatures)
             .form(form)
             .signingLog(signingLog)
             .attachments(Collections.emptyList())

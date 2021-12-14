@@ -24,10 +24,10 @@ public class IRSPayloadResource {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<String> sendIrsPayload(@RequestBody SignRequestDocumentResponse documentResponseresponse) {
-        log.info("Sign request event call back response: {}", documentResponseresponse);
-        if (StringUtils.equals(SIGNED, documentResponseresponse.getEventType())) {
-            boolean response = irsAPIService.sendPayload(documentResponseresponse);
+    public ResponseEntity<String> sendIrsPayload(@RequestBody SignRequestDocumentResponse documentResponse) {
+        log.info("Sign request event call back response: {}", documentResponse);
+        if (StringUtils.equals(SIGNED, documentResponse.getEventType())) {
+            boolean response = irsAPIService.sendPayload(documentResponse);
             return new ResponseEntity<>(String.valueOf(response), HttpStatus.OK);
         }
         return new ResponseEntity<>("false", HttpStatus.OK);
