@@ -182,10 +182,6 @@ security.saml2:
 #port: ${PORT:8181}
 #end-point: ${ENDPOINT:}
 #sign request
-#irs-token = 92a939d0b78bcee555c5bcad13abde6df1c68973
-#irs-url = https://irs.sign-dev.forms.gov/api/v1/signrequest-quick-create/
-#sba-token = 003fe3c90ac3b980c6ccf9316dbcfca931ef3045
-#sba-url = https://irs.sign-dev.forms.gov/api/v1/signrequest-quick-create/
 sign-request-token: ${SIGN_REQUEST_TOKEN:}
 sign-request-base-url: ${SIGN_BASE_URL:https://irs.sign-dev.forms.gov/api/v1/}
 sign-request-create-url: ${SIGN_CREATE_URL:signrequest-quick-create/}
