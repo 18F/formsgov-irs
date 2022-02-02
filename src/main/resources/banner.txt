@@ -1,0 +1,7 @@
+${AnsiColor.CYAN}  ___ ____  ____
+${AnsiColor.CYAN} |_ _|  _ \/ ___|
+${AnsiColor.CYAN}  | || |_) \___ \
+${AnsiColor.CYAN}  | ||  _ < ___) |
+${AnsiColor.CYAN} |___|_| \_\____/
+
+${AnsiColor.BRIGHT_BLUE}:: forms.gov :: Running Spring Boot ${spring-boot.version} :: JAVA version  ${java.version}
