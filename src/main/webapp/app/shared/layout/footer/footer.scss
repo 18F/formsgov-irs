@@ -1,0 +1,32 @@
+.footer {
+  height: 50px;
+}
+.child {
+  text-align: center;
+  color: #112e51;
+  font-weight: bold;
+  font-size: medium;
+}
+@media (max-width: 63.99em) {
+  .child {
+    font-size: 15px;
+  }
+  hr.footer-bar {
+    border: 0.5px solid #0071bc;
+  }
+}
+#footer-list {
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 0.625rem;
+}
+#footer-list li + li::before {
+  content: ' | ';
+  margin-left: -5px;
+}
+footer.row > div {
+  padding: 0;
+}
+.small-10 {
+  width: 100%;
+}
