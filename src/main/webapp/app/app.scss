@@ -319,6 +319,18 @@ http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
 hr.bar {
   border: 0.5px solid #0071bc;
 }
+.sign-in-logo.usa-button {
+  color: #1b1b1b;
+  font-weight: bold;
+  margin: 0;
+  background-color: #fff;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0.85rem;
+  padding: 0.75rem 0.5rem;
+  -webkit-box-shadow: inset 0 0 0 1px #bbb;
+  box-shadow: inset 0 0 0 1px #bbb;
+}
 @media (max-width: 63.99em) {
   .usa-logo {
     flex: 1 1 0%;
